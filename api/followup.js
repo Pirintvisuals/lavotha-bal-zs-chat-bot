@@ -2,100 +2,104 @@
 
 // ─── Email templates ──────────────────────────────────────────────────────────
 
-function buildEmail({ name, projectType, followupNumber, tier, estimatorLink, calendlyLink, ownerPhone, ownerName }) {
-  const n  = name        || 'there';
-  const pt = projectType || 'garden project';
-  const el = estimatorLink;
-  const cl = calendlyLink;
-  const op = ownerPhone;
-  const on = ownerName || 'Milán';
+function buildEmail({ name, projectType, followupNumber, tier, ownerPhone, ownerName }) {
+  const n  = name        || 'Kedves Érdeklődő';
+  const pt = projectType || 'kertészeti projekt';
+  const op = ownerPhone  || '+36 (30) 635 81 65';
+  const on = ownerName   || 'Balázs';
 
   if (tier === 'vip') {
     if (followupNumber === 1) return {
-      subject: 'Reserved your priority slot',
+      subject: 'Prioritásos konzultációs időpontot foglaltunk Önnek',
       text:
-`Hi ${n},
+`Tisztelt ${n}!
 
-I've reserved a priority consultation slot for your ${pt} project. ${on} reviewed your inquiry personally and is excited to discuss your vision.
+Prioritásos konzultációs időpontot foglaltunk az Ön ${pt} projektjéhez. ${on} személyesen áttekintette az érdeklődését és várja, hogy megbeszéljék az elképzeléseit.
 
-Your exclusive booking link: ${cl}
+Kérem, vegye fel velünk a kapcsolatot a következő telefonszámon: ${op} (hétfő-péntek 8-16 óra között).
 
-These slots fill up fast — grab yours while available.
-
-${on}`,
+Üdvözlettel,
+${on}
+Lavotha Kert`,
     };
 
     if (followupNumber === 2) return {
-      subject: 'Your personalized project estimate',
+      subject: 'Személyre szabott projektbecslés az Ön számára',
       text:
-`Hi ${n},
+`Tisztelt ${n}!
 
-I know you're considering a premium ${pt} project. Want to see exact numbers before our call?
+Tudom, hogy egy nagyobb ${pt} projektet tervez. Szívesen megbeszélnénk a részleteket és nagyvonalú árbecslést adnánk, mielőtt személyesen találkozunk.
 
-Get your personalised estimate here: ${el}
+Kérem, hívjon minket a ${op} számon (hétfő-péntek 8-16 óra között), hogy egyeztessük a helyszíni felmérés időpontját.
 
-Then we can use your consultation to discuss design details instead of pricing.
-
-Book your priority slot: ${cl}
-
-${on}`,
+Üdvözlettel,
+${on}
+Lavotha Kert`,
     };
 
-    // VIP day 5
+    // VIP 5. nap
     return {
-      subject: 'Can I ask you something?',
+      subject: 'Szeretnék megkérdezni valamit',
       text:
-`Hi ${n},
+`Tisztelt ${n}!
 
-${on} here. I noticed you haven't booked yet and I'm curious — is there something holding you back? Budget? Timeline? Something else?
+${on} vagyok a Lavotha Kerttől. Észrevettem, hogy még nem egyeztettünk a helyszíni felmérésről, és kíváncsi vagyok — van valami ami visszatartja? Határidő? Anyagi kérdés? Valami más?
 
-I'd rather know honestly so we can figure it out together.
+Inkább tudnom kell, hogy közösen megtaláljuk a legjobb megoldást.
 
-Here's my direct line: ${op}. Or if you prefer, grab a time here: ${cl}
+Közvetlen telefonszámom: ${op} (hétfő-péntek 8-16 óra között).
 
-${on}`,
+Üdvözlettel,
+${on}
+Lavotha Kert`,
     };
   }
 
-  // ── Qualified ──────────────────────────────────────────────────────────────
+  // ── Minősített lead ────────────────────────────────────────────────────────
 
   if (followupNumber === 1) return {
-    subject: `Quick question about your ${pt}`,
+    subject: `Gyors kérdés a ${pt} projektjével kapcsolatban`,
     text:
-`Hi ${n},
+`Tisztelt ${n}!
 
-I was just thinking about your ${pt} project. Have you had a chance to consider timing?
+Épp az Ön ${pt} projektjére gondoltam. Volt már lehetősége átgondolni az időzítést?
 
-Most of our clients start seeing results within 2–3 weeks of booking. Any questions I can answer?
+Ügyfeleink többsége általában a foglalásuktól számított 2-3 héten belül látja az eredményt. Van esetleg kérdése, amiben segíthetek?
 
-${on}`,
+Elérhet minket a ${op} számon (hétfő-péntek 8-16 óra).
+
+Üdvözlettel,
+${on}
+Lavotha Kert`,
   };
 
   if (followupNumber === 2) return {
-    subject: "Thought you'd want to see this",
+    subject: 'Gondoltam, ezt látni szeretné',
     text:
-`Hi ${n},
+`Tisztelt ${n}!
 
-I just finished a ${pt} project that reminded me of what you described.
+Épp befejeztem egy ${pt} projektet, ami nagyon emlékeztetett arra, amit Ön leírt.
 
-Want to see how it turned out? Reply to this email and I'll send over some photos. Does something like this match your vision?
+Szeretné látni az eredményt? Válaszoljon erre az emailre és küldök néhány fotót. Hasonló elképzelése van?
 
-${on}`,
+Üdvözlettel,
+${on}
+Lavotha Kert`,
   };
 
-  // Qualified day 5
+  // Minősített 5. nap
   return {
-    subject: 'Get your instant estimate here',
+    subject: 'Segíthetünk az időzítés tervezésében',
     text:
-`Hi ${n},
+`Tisztelt ${n}!
 
-Not sure about budget yet? Get an instant estimate for your ${pt} project here:
+Még nem döntötte el mikor valósítaná meg a ${pt} projektet? Szívesen segítünk a tervezésben.
 
-${el}
+Kérem, hívjon minket a ${op} számon (hétfő-péntek 8-16 óra között), hogy megbeszéljük a részleteket és egyeztessük a helyszíni felmérés időpontját.
 
-No commitment, just helps you plan. Takes 2 minutes. Once you see the numbers, we can chat about next steps!
-
-${on}`,
+Üdvözlettel,
+${on}
+Lavotha Kert`,
   };
 }
 
@@ -126,8 +130,8 @@ module.exports = async function handler(req, res) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        from:    process.env.RESEND_FROM || 'Landscale Bot <onboarding@resend.dev>',
-        to:      [email],
+        from: process.env.RESEND_FROM || 'Lavotha Kert <onboarding@resend.dev>',
+        to:   [email],
         subject,
         text,
       }),
@@ -135,10 +139,10 @@ module.exports = async function handler(req, res) {
 
     if (!resendRes.ok) throw new Error(`Resend ${resendRes.status}`);
 
-    console.log(`Follow-up #${followupNumber} (${tier}) sent → ${email}`);
+    console.log(`Követő email #${followupNumber} (${tier}) elküldve → ${email}`);
     return res.status(200).json({ success: true });
   } catch (err) {
-    console.error('Follow-up send error:', err.message);
+    console.error('Követő email küldési hiba:', err.message);
     return res.status(500).json({ error: err.message });
   }
 };

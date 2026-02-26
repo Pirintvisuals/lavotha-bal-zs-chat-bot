@@ -3,20 +3,20 @@
 // Pre-populate history with the bot's opening message so Gemini has context
 // when the user replies to the hardcoded greeting shown on page load.
 const OPENING_MESSAGE =
-  "Good day. I'm the Landscale Digital Assistant — here to help qualify your garden project and get you connected with Milán's team.\n\n" +
-  "Whether you're after a full patio build, soft landscaping, timber work, or ongoing maintenance, we can help.\n\n" +
-  "To get started, could I take the postcode for the property?";
+  "Jó napot kívánok! A Lavotha Kert chatbotja vagyok — segítek felmérni az Ön projektjét és kapcsolatba lépni Balázs kollégámmal.\n\n" +
+  "Akár kertépítést, öntözőrendszert, zöldfalat, beltéri növényeket vagy parkfenntartást tervez, szívesen segítünk!\n\n" +
+  "Mesélne kicsit a tervezett projektről? Milyen szolgáltatásra lenne szüksége?";
 
 // Conversation history in Gemini multi-turn format.
 // Seeded with a synthetic first exchange so the model knows its opening line.
 const history = [
-  { role: 'user',  parts: [{ text: 'Hello, I have a garden project I would like to discuss.' }] },
+  { role: 'user',  parts: [{ text: 'Szia, kertészeti projektemmel kapcsolatban érdeklődnék.' }] },
   { role: 'model', parts: [{ text: JSON.stringify({ message: OPENING_MESSAGE, lead: null }) }] },
 ];
 
-const chatMessages = document.getElementById('chatMessages');
-const messageInput  = document.getElementById('messageInput');
-const sendButton    = document.getElementById('sendButton');
+const chatMessages   = document.getElementById('chatMessages');
+const messageInput   = document.getElementById('messageInput');
+const sendButton     = document.getElementById('sendButton');
 const typingIndicator = document.getElementById('typingIndicator');
 
 // Allow Enter key to submit
@@ -49,7 +49,7 @@ async function sendMessage() {
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
     const data = await response.json();
-    const reply = data.reply || "Apologies — something went wrong on my end. Please try again.";
+    const reply = data.reply || 'Elnézést — valami hiba történt. Kérem próbálja újra.';
 
     if (data.leadSent) leadAlreadySent = true;
 
@@ -62,7 +62,7 @@ async function sendMessage() {
     appendMessage(reply, 'bot');
   } catch (err) {
     console.error('Chat error:', err);
-    appendMessage("Apologies — I'm having trouble connecting at the moment. Please try again shortly.", 'bot');
+    appendMessage('Elnézést — kapcsolódási problémám van. Kérem próbálja újra egy pillanat múlva.', 'bot');
   } finally {
     setLoading(false);
     messageInput.focus();

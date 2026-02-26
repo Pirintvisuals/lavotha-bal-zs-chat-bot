@@ -1,27 +1,29 @@
 <!DOCTYPE html>
-<html lang="en-GB">
+<html lang="hu">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Landscale — Digital Assistant</title>
+  <title>Lavotha Kert — Chatbot</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <div class="chat-container">
     <header class="chat-header">
-      <div class="header-icon" aria-hidden="true">🌿</div>
+      <div class="header-icon" aria-hidden="true">
+        <img src="logo.png" alt="Lavotha Kert logó">
+      </div>
       <div class="header-text">
-        <h1>Landscale Digital Assistant</h1>
-        <span class="header-subtitle">Representing Milán &amp; the Landscale team</span>
+        <h1>Lavotha Kert Chatbot</h1>
+        <span class="header-subtitle">Lavotha Balázs &amp; csapata — 20 év tapasztalat</span>
       </div>
     </header>
 
-    <div class="chat-messages" id="chatMessages" role="log" aria-live="polite" aria-label="Conversation">
+    <div class="chat-messages" id="chatMessages" role="log" aria-live="polite" aria-label="Beszélgetés">
       <div class="message bot">
         <div class="message-bubble">
-          Good day. I'm the Landscale Digital Assistant — here to help qualify your garden project and get you connected with Milán's team.<br><br>
-          Whether you're after a full patio build, soft landscaping, timber work, or ongoing maintenance, we can help.<br><br>
-          To get started, could I take the <strong>postcode</strong> for the property?
+          Jó napot kívánok! A Lavotha Kert chatbotja vagyok — segítek felmérni az Ön projektjét és kapcsolatba lépni Balázs kollégámmal.<br><br>
+          Akár kertépítést, öntözőrendszert, zöldfalat, beltéri növényeket vagy parkfenntartást tervez, szívesen segítünk!<br><br>
+          Mesélne kicsit a tervezett projektről? <strong>Milyen szolgáltatásra lenne szüksége?</strong>
         </div>
       </div>
     </div>
@@ -36,11 +38,11 @@
       <input
         type="text"
         id="messageInput"
-        placeholder="Type your message…"
+        placeholder="Írja be üzenetét…"
         autocomplete="off"
-        aria-label="Your message"
+        aria-label="Az Ön üzenete"
       >
-      <button id="sendButton" aria-label="Send message">
+      <button id="sendButton" aria-label="Üzenet küldése">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
           <line x1="22" y1="2" x2="11" y2="13"></line>
           <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
