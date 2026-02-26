@@ -1,7 +1,7 @@
 {
-  "name": "landscaler-faq-bot",
+  "name": "lavothakertchatbot",
   "version": "1.0.0",
-  "description": "Landscale Digital Assistant — AI-powered lead qualification chatbot",
+  "description": "Lavotha Kert Chatbot - AI lead qualification chatbot",
   "private": true,
   "dependencies": {
     "@google/generative-ai": "^0.24.0",
