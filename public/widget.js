@@ -264,7 +264,7 @@
   const fab = document.createElement('button');
   fab.id = 'lc-fab';
   fab.setAttribute('aria-label', 'Lavotha Kert chat megnyitása');
-  fab.innerHTML = '<img src="' + (CFG.logoUrl || '/logo.png') + '" alt="Lavotha Kert">';
+  fab.innerHTML = '<img src="' + (CFG.logoUrl || '/logo.jpg') + '" alt="Lavotha Kert">';
 
   const label = document.createElement('div');
   label.id = 'lc-label';
@@ -281,7 +281,7 @@
   win.classList.add('lc-hidden');
   win.innerHTML = `
     <div id="lc-header">
-      <div id="lc-header-icon"><img src="${CFG.logoUrl || '/logo.png'}" alt="Lavotha Kert logó"></div>
+      <div id="lc-header-icon"><img src="${CFG.logoUrl || '/logo.jpg'}" alt="Lavotha Kert logó"></div>
       <div id="lc-header-text">
         <div id="lc-header-title">Lavotha Kert Chatbot</div>
         <span id="lc-header-sub">Lavotha Balázs &amp; csapata — 20 év tapasztalat</span>
@@ -328,7 +328,7 @@
   function closeChat() {
     isOpen = false;
     win.classList.add('lc-hidden');
-    fab.innerHTML = '<img src="' + (CFG.logoUrl || '/logo.png') + '" alt="Lavotha Kert">';
+    fab.innerHTML = '<img src="' + (CFG.logoUrl || '/logo.jpg') + '" alt="Lavotha Kert">';
     fab.style.fontSize = '';
     fab.setAttribute('aria-label', 'Lavotha Kert chat megnyitása');
   }
