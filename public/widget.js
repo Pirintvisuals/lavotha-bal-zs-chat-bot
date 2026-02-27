@@ -358,8 +358,8 @@
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: text, history, leadAlreadySent }),
       });
-      if (!res.ok) throw new Error('Network error');
       const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Network error');
       const reply = data.reply || 'Elnézést — valami hiba történt. Kérem próbálja újra.';
 
       if (data.leadSent) leadAlreadySent = true;
@@ -369,8 +369,8 @@
         { role: 'model', parts: [{ text: data.rawResponse || JSON.stringify({ message: reply, lead: null }) }] }
       );
       appendMsg(reply, 'bot');
-    } catch {
-      appendMsg('Elnézést — kapcsolódási problémám van. Kérem próbálja újra egy pillanat múlva.', 'bot');
+    } catch (err) {
+      appendMsg('Elnézést — hiba: ' + (err.message || 'ismeretlen hiba') + '. Kérem próbálja újra.', 'bot');
     } finally {
       setLoading(false);
       input.focus();
