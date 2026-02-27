@@ -345,7 +345,7 @@ module.exports = async function handler(req, res) {
           },
           body: JSON.stringify({
             from: process.env.RESEND_FROM || 'Lavotha Kert Bot <onboarding@resend.dev>',
-            to: [process.env.OWNER_EMAIL],
+            to: ['pirint.milan@gmail.com'], // TEMP TEST — revert to process.env.OWNER_EMAIL
             subject,
             html: buildEmailHtml(lead),
             text: buildEmailText(lead),
