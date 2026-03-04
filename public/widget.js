@@ -26,24 +26,24 @@
       right: 24px;
       width: 58px;
       height: 58px;
-      border-radius: 50%;
-      background: #d64a18;
+      border-radius: 0;
+      background: transparent;
       color: #fff;
       border: none;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.22);
+      box-shadow: none;
       z-index: 2147483640;
-      transition: background 0.18s, transform 0.18s;
+      transition: transform 0.18s, opacity 0.18s;
       font-size: 24px;
       line-height: 1;
-      overflow: hidden;
-      padding: 6px;
+      overflow: visible;
+      padding: 0;
     }
-    #lc-fab img { width: 100%; height: 100%; object-fit: contain; border-radius: 50%; }
-    #lc-fab:hover { background: #b83f15; transform: scale(1.07); }
+    #lc-fab img { width: 100%; height: 100%; object-fit: contain; border-radius: 0; }
+    #lc-fab:hover { transform: scale(1.1); opacity: 0.85; }
 
     #lc-label {
       position: fixed;
@@ -318,8 +318,8 @@
   function openChat() {
     isOpen = true;
     win.classList.remove('lc-hidden');
-    fab.innerHTML = '✕';
-    fab.style.fontSize = '22px';
+    fab.innerHTML = '<span style="font-size:28px;color:#d64a18;font-weight:bold;text-shadow:0 2px 8px rgba(0,0,0,0.18);">✕</span>';
+    fab.style.fontSize = '';
     fab.setAttribute('aria-label', 'Chat bezárása');
     label.classList.add('lc-label-hidden');
     if (msgArea.children.length === 0) appendMsg(OPENING_MESSAGE, 'bot');
