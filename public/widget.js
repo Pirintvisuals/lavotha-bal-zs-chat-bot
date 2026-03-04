@@ -142,17 +142,22 @@
     #lc-header-title { font-size: 14px; font-weight: 700; margin: 0; }
     #lc-header-sub { font-size: 11px; opacity: 0.75; display: block; margin-top: 1px; }
     #lc-close {
-      background: none;
+      background: #d64a18;
       border: none;
-      color: rgba(255,255,255,0.8);
+      color: #fff;
       cursor: pointer;
-      font-size: 20px;
+      font-size: 16px;
       line-height: 1;
-      padding: 2px 4px;
-      border-radius: 4px;
-      transition: color 0.15s;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: background 0.15s;
     }
-    #lc-close:hover { color: #fff; }
+    #lc-close:hover { background: #b83f15; }
 
     #lc-messages {
       flex: 1;
