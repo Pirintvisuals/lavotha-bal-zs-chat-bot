@@ -59,11 +59,14 @@
       box-shadow: 0 6px 24px rgba(0,0,0,0.22);
       white-space: nowrap;
       z-index: 2147483641;
-      pointer-events: none;
+      pointer-events: auto;
+      cursor: pointer;
       transition: opacity 0.4s, transform 0.4s;
       transform: translateY(0);
       letter-spacing: -0.01em;
+      user-select: none;
     }
+    #lc-label:hover { box-shadow: 0 8px 28px rgba(0,0,0,0.28); }
     #lc-label::after {
       content: '';
       position: absolute;
@@ -267,13 +270,37 @@
   fab.setAttribute('aria-label', 'Lavotha Kert chat megnyitása');
   fab.innerHTML = '<img src="' + (LOGO_URL) + '" alt="Lavotha Kert">';
 
+  const labelQuestions = [
+    'Szeretné álmai kertjét megvalósítani?',
+    'Öntözőrendszert tervez? Segítünk!',
+    'Kertépítés, zöldfal, parkfenntartás?',
+    'Ingyenes tanácsadás — kérdezzen bátran!',
+    'Beltéri növényeket szeretne? Megoldjuk!',
+    '20 év tapasztalat — kérdezzen most!',
+  ];
+  let labelIndex = 0;
+  let labelTimer = null;
+
   const label = document.createElement('div');
   label.id = 'lc-label';
-  label.textContent = 'Szeretné álmai kertjét megvalósítani? 🌿';
+  label.textContent = labelQuestions[0];
   document.body.appendChild(label);
 
-  // Auto-hide the label after 5 seconds
-  setTimeout(() => label.classList.add('lc-label-hidden'), 5000);
+  function scheduleNextLabel() {
+    labelTimer = setTimeout(() => {
+      // fade in next question
+      labelIndex = (labelIndex + 1) % labelQuestions.length;
+      label.textContent = labelQuestions[labelIndex];
+      label.classList.remove('lc-label-hidden');
+    }, 6000); // reappear after 6s with next question
+  }
+
+  label.addEventListener('click', () => {
+    if (isOpen) return;
+    label.classList.add('lc-label-hidden');
+    clearTimeout(labelTimer);
+    scheduleNextLabel();
+  });
 
   const win = document.createElement('div');
   win.id = 'lc-window';
@@ -321,6 +348,7 @@
     fab.innerHTML = '<span style="font-size:28px;color:#d64a18;font-weight:bold;text-shadow:0 2px 8px rgba(0,0,0,0.18);">✕</span>';
     fab.style.fontSize = '';
     fab.setAttribute('aria-label', 'Chat bezárása');
+    clearTimeout(labelTimer);
     label.classList.add('lc-label-hidden');
     if (msgArea.children.length === 0) appendMsg(OPENING_MESSAGE, 'bot');
     setTimeout(() => input.focus(), 220);
@@ -332,6 +360,8 @@
     fab.innerHTML = '<img src="' + (LOGO_URL) + '" alt="Lavotha Kert">';
     fab.style.fontSize = '';
     fab.setAttribute('aria-label', 'Lavotha Kert chat megnyitása');
+    // Show next question after chat closes
+    scheduleNextLabel();
   }
 
   fab.addEventListener('click', () => isOpen ? closeChat() : openChat());
