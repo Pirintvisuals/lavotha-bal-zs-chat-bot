@@ -26,7 +26,7 @@
       right: 24px;
       width: 58px;
       height: 58px;
-      border-radius: 0;
+      border-radius: 50%;
       background: transparent;
       color: #fff;
       border: none;
@@ -39,10 +39,10 @@
       transition: transform 0.18s, opacity 0.18s;
       font-size: 24px;
       line-height: 1;
-      overflow: visible;
+      overflow: hidden;
       padding: 0;
     }
-    #lc-fab img { width: 100%; height: 100%; object-fit: contain; border-radius: 0; }
+    #lc-fab img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
     #lc-fab:hover { transform: scale(1.1); opacity: 0.85; }
 
     #lc-label {
