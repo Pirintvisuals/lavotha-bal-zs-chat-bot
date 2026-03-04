@@ -108,12 +108,10 @@ Ha az ügyfél kérdezi, hogy mennyi ideig tart egy projekt, NE adj meg konkrét
 
 MUNKAKEZDÉS ELŐTT AZ ÜGYFÉLTŐL SZÜKSÉGES: szabad bejutás, akadálymentes munkaterület, víz elérhetősége, áram elérhetősége
 
-ÁRBECSLÉSHEZ HASZNOS INFORMÁCIÓK (amiket érdemes megkérdezni):
-- Terület mérete, fekvése, megközelíthetősége
+HASZNOS HÁTTÉRINFORMÁCIÓ (ami segíthet Balázsnak, de nem kötelező megkérdezni):
 - Talajállapot, talajszerkezet (ha az ügyfél tudja)
 - Jelenlegi vegetáció a területen
 - Van-e már rendezési / ültetési / öntözési terv
-- Mikor tervezi a kivitelezést (várható időpont)
 
 LEGGYAKORIBB KÉRDÉSEK ÉS HELYES VÁLASZOK:
 K: Vállalnak kerttervezést és kivitelezést is?
@@ -131,15 +129,15 @@ HOGYAN REAGÁLJ — ezt a mintát kövesd minden üzenetnél:
 MINŐSÍTÉSI FOLYAMAT — gyűjtsd be a következőket természetes sorrendben, egyszerre egyet:
 1. Projekt típusa — milyen szolgáltatásra lenne szüksége (kertépítés, öntözőrendszer, zöldfal, beltéri növények, parkfenntartás) — ha nem egyértelmű, KÉRDEZZ RÁ, ne tippelj
 2. Helyszín — pontosan hol található a projekt (város, BAZ megye ellenőrzése céljából)
-3. Terület mérete — kb. hány m²
-4. Nagyvonalú költségkeret — Ft-ban, KÖTELEZŐ megkérdezni, soha ne hagyd ki — e nélkül NEM küldhetsz összefoglalót
+3. Nagyvonalú költségkeret — Ft-ban, KÖTELEZŐ megkérdezni, soha ne hagyd ki — e nélkül NEM küldhetsz összefoglalót
+4. Mikor tervezi a munkát / kivitelezést — kötelező megkérdezni (pl. tavasszal, 2025 nyarán, minél hamarabb stb.)
 5. Teljes név — kötelező
 6. Telefonszám — kötelező, magyar formátum: +36 XX XXX XXXX
 7. Email cím — opcionális, kérd meg de ha nem adja meg, folytasd nélküle
-8. Fotók — miután összegyűjtötted a kötelező kontaktadatokat, kérd meg az ügyfelet, hogy küldjön több fotót a kertről különböző szögekből: elküldheti a ${photosEmail} email címre, vagy feltöltheti közvetlenül a formon keresztül. Ez segít a pontosabb árbecslésben.
+8. Fotók — miután összegyűjtötted a kötelező kontaktadatokat, kérd meg az ügyfelet, hogy küldjön több fotót a kertről különböző szögekből: elküldheti a ${photosEmail} email címre, vagy feltöltheti közvetlenül a formon keresztül.
 
 FONTOS: Természetesen és folyamatosan kérdezz. Egyszerre csak egy információt kérj. Soha ne kérj mindent egyszerre.
-TILOS: Összefoglalót adni vagy leadet lezárni, ha a költségkeret még nem ismert. Előbb mindig kérdezd meg: "Nagyvonalúan mekkora összeget szánt erre a projektre?"
+TILOS: Összefoglalót adni vagy leadet lezárni, ha a költségkeret vagy a tervezett időpont még nem ismert.
 
 PROJEKT SZŰRÉSI LOGIKA:
 
@@ -189,7 +187,7 @@ Telefon: [telefonszám]
 Email: [email vagy "Nincs megadva"]
 Cím: [pontos cím]
 Projekt típusa: [típus]
-Terület: [m² ha megvan]
+Tervezett időpont: [mikor]
 Költségkeret: [Ft]
 
 ✅ KÖVETKEZŐ LÉPÉSEK:
@@ -201,7 +199,7 @@ LEAD OBJEKTUM SZABÁLYAI:
 Csak akkor töltsd ki a "lead" mezőt a JSON válaszban, ha MINDHÁROM teljesül:
 1. A költségkeret legalább 500 000 Ft
 2. A helyszín BAZ megyén belül van (Miskolc vagy egyéb BAZ megyei település)
-3. Összegyűjtötted: nevet, telefonszámot, pontos címet, költségkeretet és projekt típusát
+3. Összegyűjtötted: nevet, telefonszámot, pontos címet, költségkeretet, projekt típusát és a tervezett időpontot
 Az email opcionális — add meg ha megadta, üres string "" ha nem.
 Állítsd a "priority" mezőt true-ra csak ha a költségkeret 20 000 000 Ft felett van.
 Ha a helyszín Miskolcon kívüli BAZ megyei város, add a notes mezőhöz: "Kiszállási díj várható a helyszín távolsága miatt."
@@ -215,7 +213,8 @@ KIMENETI FORMÁTUM — MINDIG érvényes JSON objektummal válaszolj ebben a pon
     "phone": "Telefonszám",
     "address": "Pontos cím (utca, házszám, város)",
     "budget": "Költségkeret ahogy az ügyfél megadta",
-    "scope": "Projekt típusának és terjedelmének rövid összefoglalója",
+    "scope": "Projekt típusának rövid összefoglalója",
+    "timing": "Mikor tervezi a kivitelezést (ahogy az ügyfél megadta)",
     "notes": "Egyéb releváns részletek a beszélgetésből",
     "priority": false
   },
@@ -303,7 +302,7 @@ async function scheduleFollowUps(lead, tier) {
 }
 
 function buildEmailHtml(lead) {
-  const { name, email, phone, address, budget, scope, notes, priority } = lead;
+  const { name, email, phone, address, budget, scope, timing, notes, priority } = lead;
   const photosEmail = process.env.PHOTOS_EMAIL || process.env.OWNER_EMAIL;
   const priorityBanner = priority
     ? `<div style="background:#c0392b;color:#fff;padding:16px;font-size:18px;font-weight:bold;text-align:center;border-radius:6px;margin-bottom:24px;">&#x1F6A8; KIEMELT PRIORITÁSÚ ÉRDEKLŐDŐ &#x1F6A8;</div>`
@@ -331,6 +330,7 @@ function buildEmailHtml(lead) {
         ${row('Helyszín', address)}
         ${row('Költségkeret', budget)}
         ${row('Projekt', scope)}
+        ${timing ? row('Időpont', timing) : ''}
         ${notes ? row('Megjegyzések', notes) : ''}
       </table>
       <p style="margin-top:20px;padding:14px;background:#f4f7f4;border-radius:6px;font-size:13px;color:#4a6a4a;">
@@ -344,10 +344,10 @@ function buildEmailHtml(lead) {
 }
 
 function buildEmailText(lead) {
-  const { name, email, phone, address, budget, scope, notes, priority } = lead;
+  const { name, email, phone, address, budget, scope, timing, notes, priority } = lead;
   const photosEmail = process.env.PHOTOS_EMAIL || process.env.OWNER_EMAIL;
   const banner = priority ? '*** KIEMELT PRIORITÁSÚ ÉRDEKLŐDŐ ***\n\n' : '';
-  return `${banner}Új Lavotha Kert Érdeklődő\n${'='.repeat(40)}\n\nÜgyfél:       ${name}\nEmail:        ${email || 'Nincs megadva'}\nTelefon:      ${phone}\nHelyszín:     ${address}\nKöltségkeret: ${budget}\nProjekt:      ${scope}${notes ? `\nMegjegyzések: ${notes}` : ''}\n\n----\nAz ügyfelet megkértük, hogy küldjön 3 fotót a kertről (különböző szögekből) ide: ${photosEmail}`;
+  return `${banner}Új Lavotha Kert Érdeklődő\n${'='.repeat(40)}\n\nÜgyfél:       ${name}\nEmail:        ${email || 'Nincs megadva'}\nTelefon:      ${phone}\nHelyszín:     ${address}\nKöltségkeret: ${budget}\nProjekt:      ${scope}${timing ? `\nIdőpont:      ${timing}` : ''}${notes ? `\nMegjegyzések: ${notes}` : ''}\n\n----\nAz ügyfelet megkértük, hogy küldjön 3 fotót a kertről (különböző szögekből) ide: ${photosEmail}`;
 }
 
 module.exports = async function handler(req, res) {
