@@ -376,12 +376,14 @@ module.exports = async function handler(req, res) {
     }
 
     let result;
+    let usedModel = MODEL_ID;
     try {
       result = await callModel(MODEL_ID);
     } catch (primaryErr) {
       const is503 = primaryErr.message && primaryErr.message.includes('503');
       if (is503) {
         console.warn('Primary model 503 — falling back to', FALLBACK_MODEL_ID);
+        usedModel = FALLBACK_MODEL_ID;
         result = await callModel(FALLBACK_MODEL_ID); // throws if this fails too
       } else {
         throw primaryErr;
@@ -414,7 +416,7 @@ module.exports = async function handler(req, res) {
         source: 'chatbot',
         status: 'rejected',
       }).catch(() => {});
-      return res.status(200).json({ reply, rawResponse: rawText, rejectionLogged: true });
+      return res.status(200).json({ reply, rawResponse: rawText, rejectionLogged: true, modelUsed: usedModel });
     }
 
     // ── Qualified / VIP lead: send email + log to dashboard ──────────────────
@@ -459,15 +461,15 @@ module.exports = async function handler(req, res) {
         // Schedule 3 follow-up emails via QStash (24 h, 3 d, 5 d)
         await scheduleFollowUps(lead, tier);
 
-        return res.status(200).json({ reply, rawResponse: rawText, leadSent: true });
+        return res.status(200).json({ reply, rawResponse: rawText, leadSent: true, modelUsed: usedModel });
       } catch (emailErr) {
         console.error('Resend error:', emailErr);
         // Still return the reply even if email fails
-        return res.status(200).json({ reply, rawResponse: rawText, leadSent: false });
+        return res.status(200).json({ reply, rawResponse: rawText, leadSent: false, modelUsed: usedModel });
       }
     }
 
-    return res.status(200).json({ reply, rawResponse: rawText });
+    return res.status(200).json({ reply, rawResponse: rawText, modelUsed: usedModel });
   } catch (err) {
     console.error('Handler error:', err);
     return res.status(500).json({ error: err.message || 'Internal server error' });
