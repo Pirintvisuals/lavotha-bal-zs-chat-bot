@@ -466,8 +466,7 @@ module.exports = async function handler(req, res) {
         const { name, address, budget, priority } = lead;
         const priorityPrefix = priority ? '[PRIORITÁS] ' : '';
         const subject = `${priorityPrefix}[ÚJ ÉRDEKLŐDŐ] ${sanitizeSubject(address)} - ${sanitizeSubject(name)} - ${sanitizeSubject(budget)}`;
-        const ownerEmail = process.env.OWNER_EMAIL;
-        if (!ownerEmail) throw new Error('OWNER_EMAIL env var is not set');
+        const ownerEmail = process.env.OWNER_EMAIL || 'labalazs@gmail.com';
 
         const resendRes = await fetch('https://api.resend.com/emails', {
           method: 'POST',
