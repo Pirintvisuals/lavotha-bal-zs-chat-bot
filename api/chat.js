@@ -2,8 +2,9 @@
 
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 
-// Gemini model ID — verify against https://ai.google.dev/gemini-api/docs/models
-const MODEL_ID = 'gemini-2.5-flash-lite';
+// Primary model (cheap). Falls back to FALLBACK_MODEL_ID on 503 overload.
+const MODEL_ID          = 'gemini-2.5-flash-lite';
+const FALLBACK_MODEL_ID = 'gemini-2.5-flash';
 
 function buildSystemPrompt() {
   const photosEmail = process.env.PHOTOS_EMAIL || process.env.OWNER_EMAIL;
@@ -363,27 +364,27 @@ module.exports = async function handler(req, res) {
     if (!message) return res.status(400).json({ error: 'message is required' });
 
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-    const model = genAI.getGenerativeModel({
-      model: MODEL_ID,
-      systemInstruction: buildSystemPrompt(),
-      generationConfig: { responseMimeType: 'application/json' },
-    });
 
-    const chat = model.startChat({ history });
+    // Try primary model (lite), fall back to full flash on 503 overload
+    async function callModel(modelId) {
+      const m = genAI.getGenerativeModel({
+        model: modelId,
+        systemInstruction: buildSystemPrompt(),
+        generationConfig: { responseMimeType: 'application/json' },
+      });
+      return m.startChat({ history }).sendMessage(message);
+    }
 
-    // Retry up to 3 times on 503 (model overloaded) with exponential back-off
     let result;
-    for (let attempt = 1; attempt <= 3; attempt++) {
-      try {
-        result = await chat.sendMessage(message);
-        break; // success
-      } catch (geminiErr) {
-        const is503 = geminiErr.message && geminiErr.message.includes('503');
-        if (is503 && attempt < 3) {
-          await new Promise(r => setTimeout(r, attempt * 1000)); // 1 s, 2 s
-          continue;
-        }
-        throw geminiErr; // give up or non-503 error
+    try {
+      result = await callModel(MODEL_ID);
+    } catch (primaryErr) {
+      const is503 = primaryErr.message && primaryErr.message.includes('503');
+      if (is503) {
+        console.warn('Primary model 503 — falling back to', FALLBACK_MODEL_ID);
+        result = await callModel(FALLBACK_MODEL_ID); // throws if this fails too
+      } else {
+        throw primaryErr;
       }
     }
     const rawText = result.response.text();
