@@ -2,9 +2,14 @@
 
 // ─── Email templates ──────────────────────────────────────────────────────────
 
+// Strip anything that's not plain text to prevent content injection
+function sanitizeText(str) {
+  return String(str || '').replace(/[<>]/g, '').substring(0, 200);
+}
+
 function buildEmail({ name, projectType, followupNumber, tier, ownerPhone, ownerName }) {
-  const n  = name        || 'Kedves Érdeklődő';
-  const pt = projectType || 'kertészeti projekt';
+  const n  = sanitizeText(name)        || 'Kedves Érdeklődő';
+  const pt = sanitizeText(projectType) || 'kertészeti projekt';
   const op = ownerPhone  || '+36 (30) 635 81 65';
   const on = ownerName   || 'Balázs';
 
@@ -116,8 +121,9 @@ module.exports = async function handler(req, res) {
 
   const { name, email, projectType, tier, followupNumber } = body;
 
-  if (!email || !followupNumber) {
-    return res.status(400).json({ error: 'Missing required fields' });
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!email || !emailRegex.test(email) || !followupNumber) {
+    return res.status(400).json({ error: 'Missing or invalid required fields' });
   }
 
   const { subject, text } = buildEmail(body);

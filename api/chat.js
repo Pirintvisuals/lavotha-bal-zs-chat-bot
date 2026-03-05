@@ -235,6 +235,23 @@ Ha a projekt nem felel meg a feltételeknek (BAZ megyén kívül, vagy 500 000 F
 }`;
 }
 
+// ── Security helpers ──────────────────────────────────────────────────────────
+
+// Strip newlines/carriage-returns to prevent email header injection
+function sanitizeSubject(str) {
+  return String(str).replace(/[\r\n\t]/g, ' ').substring(0, 200);
+}
+
+// Escape HTML special chars to prevent injection in email body
+function escapeHtml(str) {
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#x27;');
+}
+
 function extractJSON(text) {
   // Direct parse
   try { return JSON.parse(text); } catch {}
@@ -255,7 +272,7 @@ async function logLeadToDashboard(payload) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'X-API-Key': process.env.DASHBOARD_API_KEY || 'dev-key-change-me',
+        'X-API-Key': process.env.DASHBOARD_API_KEY || '',
       },
       body: JSON.stringify(payload),
       signal: AbortSignal.timeout(5000),
@@ -308,11 +325,14 @@ function buildEmailHtml(lead) {
   const priorityBanner = priority
     ? `<div style="background:#c0392b;color:#fff;padding:16px;font-size:18px;font-weight:bold;text-align:center;border-radius:6px;margin-bottom:24px;">&#x1F6A8; KIEMELT PRIORITÁSÚ ÉRDEKLŐDŐ &#x1F6A8;</div>`
     : '';
-  const row = (label, value, href) =>
-    `<tr>
-      <td style="padding:10px 14px;font-weight:600;background:#f4f7f4;color:#1a2e1a;width:130px;border-bottom:1px solid #e0e8e0;">${label}</td>
-      <td style="padding:10px 14px;border-bottom:1px solid #e0e8e0;">${href ? `<a href="${href}" style="color:#1e4620;">${value}</a>` : value}</td>
+  const row = (label, value, href) => {
+    const safeVal = escapeHtml(value || '');
+    const safeHref = href ? escapeHtml(href) : null;
+    return `<tr>
+      <td style="padding:10px 14px;font-weight:600;background:#f4f7f4;color:#1a2e1a;width:130px;border-bottom:1px solid #e0e8e0;">${escapeHtml(label)}</td>
+      <td style="padding:10px 14px;border-bottom:1px solid #e0e8e0;">${safeHref ? `<a href="${safeHref}" style="color:#1e4620;">${safeVal}</a>` : safeVal}</td>
     </tr>`;
+  };
 
   return `<!DOCTYPE html>
 <html lang="hu">
@@ -355,15 +375,21 @@ module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'DENY');
 
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   try {
     const { message, history = [], leadAlreadySent = false, rejectedLogSent = false } = req.body;
-    if (!message) return res.status(400).json({ error: 'message is required' });
+    if (!message || typeof message !== 'string') return res.status(400).json({ error: 'message is required' });
+    if (message.length > 4000) return res.status(400).json({ error: 'Message too long' });
+    if (!Array.isArray(history) || history.length > 100) return res.status(400).json({ error: 'Invalid history' });
 
-    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) return res.status(500).json({ error: 'API configuration error' });
+    const genAI = new GoogleGenerativeAI(apiKey);
 
     // Try primary model (lite), fall back to full flash on 503 overload
     async function callModel(modelId) {
@@ -439,7 +465,9 @@ module.exports = async function handler(req, res) {
       try {
         const { name, address, budget, priority } = lead;
         const priorityPrefix = priority ? '[PRIORITÁS] ' : '';
-        const subject = `${priorityPrefix}[ÚJ ÉRDEKLŐDŐ] ${address} - ${name} - ${budget}`;
+        const subject = `${priorityPrefix}[ÚJ ÉRDEKLŐDŐ] ${sanitizeSubject(address)} - ${sanitizeSubject(name)} - ${sanitizeSubject(budget)}`;
+        const ownerEmail = process.env.OWNER_EMAIL;
+        if (!ownerEmail) throw new Error('OWNER_EMAIL env var is not set');
 
         const resendRes = await fetch('https://api.resend.com/emails', {
           method: 'POST',
@@ -449,7 +477,7 @@ module.exports = async function handler(req, res) {
           },
           body: JSON.stringify({
             from: process.env.RESEND_FROM || 'Lavotha Kert Bot <onboarding@resend.dev>',
-            to: ['pirint.milan@gmail.com'],
+            to: [ownerEmail],
             subject,
             html: buildEmailHtml(lead),
             text: buildEmailText(lead),
