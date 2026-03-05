@@ -485,9 +485,6 @@ module.exports = async function handler(req, res) {
 
         if (!resendRes.ok) throw new Error(`Resend error: ${resendRes.status}`);
 
-        // Schedule 3 follow-up emails via QStash (24 h, 3 d, 5 d)
-        await scheduleFollowUps(lead, tier);
-
         return res.status(200).json({ reply, rawResponse: rawText, leadSent: true, modelUsed: usedModel });
       } catch (emailErr) {
         console.error('Resend error:', emailErr);
