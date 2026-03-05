@@ -370,7 +370,22 @@ module.exports = async function handler(req, res) {
     });
 
     const chat = model.startChat({ history });
-    const result = await chat.sendMessage(message);
+
+    // Retry up to 3 times on 503 (model overloaded) with exponential back-off
+    let result;
+    for (let attempt = 1; attempt <= 3; attempt++) {
+      try {
+        result = await chat.sendMessage(message);
+        break; // success
+      } catch (geminiErr) {
+        const is503 = geminiErr.message && geminiErr.message.includes('503');
+        if (is503 && attempt < 3) {
+          await new Promise(r => setTimeout(r, attempt * 1000)); // 1 s, 2 s
+          continue;
+        }
+        throw geminiErr; // give up or non-503 error
+      }
+    }
     const rawText = result.response.text();
 
     const parsed = extractJSON(rawText);
